@@ -5,13 +5,12 @@
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
 import Room from './components/room/index.vue'
 
 export default {
   name: 'app',
   components: {
-    HelloWorld, Room
+    Room
   }
 }
 </script>
@@ -20,6 +19,6 @@ export default {
 html, body{
 	margin: 0;
 	padding: 0;
-	font-size: 12px;
+	font-size: 24px;
 }
 </style>
