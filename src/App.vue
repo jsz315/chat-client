@@ -6,6 +6,7 @@
 
 <script>
 import Room from './components/room/index.vue'
+import './core/client'
 
 export default {
   name: 'app',
