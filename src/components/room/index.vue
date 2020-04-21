@@ -28,7 +28,9 @@
 	  },
 	  methods:{
 		  login(){
-			socket = io('http://localhost:5566');
+        console.log('login');
+      // socket = io('https://wlwol.cn:8899');
+      socket = io('ws://127.0.0.1:8899');
 			socket.on('connect', ()=>{
 				console.log('connect');
 				// this.send(this.nickName);
