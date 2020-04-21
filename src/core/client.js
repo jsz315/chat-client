@@ -1,5 +1,6 @@
 // import listener from './listener'
 // import Message from './message'
+import io from 'socket.io-client';
 
 var socket;
 
@@ -47,7 +48,6 @@ listener.on('send', obj=>{
 */
 
 export default {
-    socket,
     init,
     send,
     on
