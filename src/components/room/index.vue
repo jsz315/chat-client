@@ -48,9 +48,14 @@ export default {
         client.disconnect();
       },
         login() {
-            client.init("http://localhost:8899");
+            client.init("ws://localhost:8899");
             client.on(Message.TYPE_CONNECT, () => {
-                client.send(Message.TYPE_LOGIN, { nickName: this.nickName });
+                client.send(Message.TYPE_LOGIN, { 
+                    nickName: this.nickName,
+                    avatarUrl: 'https://gss0.bdstatic.com/7Ls0a8Sm1A5BphGlnYG/sys/portrait/item/5d8356656e6e655f576f6e679218.jpg',
+                    openid: '123456',
+                    gender: 1,
+                });
             });
             client.on(Message.TYPE_MESSAGE, data => {
                 this.addMessage(data.player.nickName + "：" + data.msg);
