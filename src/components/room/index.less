@@ -1,10 +1,12 @@
 .room{
+	font-size: 24px;
 	.inputs{
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		padding: 40px 40px;
+		padding: 20px 40px;
 		color: #999999;
+		background: #ffffff;
 		.txt{
 			display: block;
 			flex: 1;
@@ -18,9 +20,10 @@
 			height: 60px;
 			line-height: 60px;
 			padding: 0 20px;
-			margin-left: 1px;
+			margin-left: 4px;
 			background: #004444;
 			color: #ffffff;
+			cursor: pointer;
 		}
 	}
 	.say{
@@ -34,9 +37,61 @@
 	.list{
 		text-align: left;
 		border-top: solid 1px #F0F0F0;
+		margin-bottom: 120px;
 		.item{
 			border-bottom: solid 1px #F0F0F0;
 			padding: 30px;
+			word-wrap: break-word;
 		}
 	}
+}
+
+@media screen and (min-width: 768PX){
+.room{
+	font-size: 24PX;
+	.inputs{
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 20PX 40PX;
+		color: #999999;
+		background: #ffffff;
+		.txt{
+			display: block;
+			flex: 1;
+			padding: 8PX;
+			margin-left: 20PX;
+			height: 60PX;
+			line-height: 60PX;
+			box-sizing: border-box;
+		}
+		.btn{
+			height: 60PX;
+			line-height: 60PX;
+			padding: 0 20PX;
+			margin-left: 4PX;
+			background: #004444;
+			color: #ffffff;
+			cursor: pointer;
+		}
+	}
+	.say{
+		position: fixed;
+		left: 0;
+		bottom: 0;
+		z-index: 1;
+		width: 100%;
+		box-sizing: border-box;
+	}
+	.list{
+		text-align: left;
+		border-top: solid 1PX #F0F0F0;
+		margin-bottom: 120PX;
+		.item{
+			border-bottom: solid 1PX #F0F0F0;
+			padding: 30PX;
+			word-wrap: break-word;
+		}
+	}
+}
 }
