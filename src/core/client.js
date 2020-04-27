@@ -5,7 +5,9 @@ import io from 'socket.io-client';
 var socket;
 
 function init(url){
-    socket = io(url);
+    socket = io(url, {
+        // transports: [ 'websocket', 'polling' ]
+    });
 }
 
 function send(type, data){
@@ -15,6 +17,23 @@ function send(type, data){
 function on(type, callback){
     socket.on(type, callback);
 }
+
+// function init(url){
+//     socket = new WebSocket(url);
+//     socket.onmessage = function(e){
+//         console.log(e);
+//     }
+// }
+
+// function send(type, data){
+//     socket.send(JSON.stringify([type, data]));
+// }
+
+// function on(type, callback){
+
+// }
+
+
 
 /*
 listener.on('init', (url)=>{
