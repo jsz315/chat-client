@@ -29,6 +29,8 @@ import client from "../../core/client";
 
 var socket;
 var ready = false;
+
+var ws;
 export default {
     name: "HelloWorld",
     data() {
@@ -42,91 +44,32 @@ export default {
     props: {
         msg: String
     },
+    mounted(){
+        
+    },
     methods: {
         login() {
-            client.init("ws://localhost:8899");
-            client.on(Message.TYPE_CONNECT, () => {
-                client.send(Message.TYPE_LOGIN, { 
-                    nickName: this.nickName,
-                    avatarUrl: 'https://gss0.bdstatic.com/7Ls0a8Sm1A5BphGlnYG/sys/portrait/item/5d8356656e6e655f576f6e679218.jpg',
-                    openid: '123456',
-                    gender: 1,
-                });
-            });
-            client.on(Message.TYPE_MESSAGE, data => {
-                this.addMessage(data.player.nickName + "：" + data.msg);
-            });
-            client.on(Message.TYPE_LOGIN, data => {
-                this.addMessage("【" + data.nickName + "  （" + data.id + "）进入房间】");
-            });
-            client.on(Message.TYPE_WAIT_MATCH, data => {
-                console.log(Message.TYPE_WAIT_MATCH);
-                console.log(data);
-                this.addMessage("当前玩家个数：" + data.length);
-            })
-            client.on(Message.TYPE_END_MATCH, data => {
-                console.log(Message.TYPE_END_MATCH);
-                console.log(data);
+            ws = new WebSocket("ws://127.0.0.1:5566");
+            ws.onopen = function(e){
                 ready = true;
-                this.addMessage("匹配完成");
-            })
-            client.on(Message.TYPE_EXIT_MATCH, data => {
-                console.log(Message.TYPE_END_MATCH);
-                console.log(data);
-                ready = false;
-                this.addMessage(data.nickName + "退出");
-            })
-            /*
-            listener.emit('init', "http://localhost:8899", this.nickName);
-            listener.on('connect', ()=>{
-                listener.emit('send', {
-                    type: Message.TYPE_LOGIN,
-                    data: {
-                        nickName: this.nickName
-                    }
-                });
-            })
+                console.log("serve start");
+                console.log(e);
+            }
 
-            listener.on(Message.TYPE_MESSAGE, data=>{
-                this.addMessage(data);
-            })
+            ws.onclose = function(e){
+                console.log("serve close");
+                console.log(e);
+            }
 
-            listener.on(Message.TYPE_START_MATCH, ()=>{
-                this.status = '查找匹配对手';
-            })
+            ws.onmessage = function(e){
+                console.log("serve message");
+                console.log(e);
+            }
 
-            listener.on(Message.TYPE_END_MATCH, (data)=>{
-                this.status = '匹配对手成功';
-                this.addMessage(data);
-            })
-
-
-            listener.on('disconnect', ()=>{
-
-            })
-            */
-
-            /*
-            //线上
-            // socket = io('wss://wlwol.cn');
-
-            //本地
-            socket = io('http://localhost:8899');
-            socket.on('connect', ()=>{
-                console.log('socket connect====');
-                socket.emit('login', this.nickName);
-            });
-            
-            socket.on('msg', (data)=>{
-                console.log('socket msg====');
-                console.log(data);
-                this.addMessage(data);
-            });
-            
-            socket.on('disconnect', ()=>{
-                console.log('socket disconnect====');
-            });
-            */
+            ws.onerror = function(e){
+                console.log("serve error");
+                console.log(e);
+            }
         },
         say() {
             if(ready){
@@ -140,7 +83,8 @@ export default {
             this.list = [];
         },
         send(msg) {
-            client.send(Message.TYPE_MESSAGE, msg);
+            // client.send(Message.TYPE_MESSAGE, msg);
+            ws.send(msg);
             this.message = "";
         },
         startMatch() {
