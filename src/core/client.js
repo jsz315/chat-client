@@ -6,7 +6,8 @@ var socket;
 
 function init(url){
     socket = io(url, {
-        // transports: [ 'websocket', 'polling' ]
+        transports: [ 'websocket', 'polling' ],
+        cookie: false
     });
 }
 

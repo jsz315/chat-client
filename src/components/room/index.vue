@@ -30,6 +30,7 @@ import client from "../../core/client";
 
 var socket;
 var ready = false;
+var tt = 0;
 export default {
     name: "HelloWorld",
     data() {
@@ -48,8 +49,10 @@ export default {
         client.disconnect();
       },
         login() {
-            client.init("ws://localhost:8899");
+            // client.init("ws://localhost:7788");
+            client.init("wss://wlwol.cn");
             client.on(Message.TYPE_CONNECT, () => {
+              tt = Date.now();
                 client.send(Message.TYPE_LOGIN, { 
                     nickName: this.nickName,
                     avatarUrl: 'https://gss0.bdstatic.com/7Ls0a8Sm1A5BphGlnYG/sys/portrait/item/5d8356656e6e655f576f6e679218.jpg',
@@ -80,6 +83,20 @@ export default {
                 ready = false;
                 this.addMessage(data.nickName + "退出");
             })
+
+            client.on(Message.TYPE_DISCONNECT, data => {
+              var n = Date.now() - tt;
+              var m = Math.floor(n / 1000);
+              console.log(data, m + 's 断开连接');
+              tt = Date.now();
+            })
+            client.on('keep-alive', data=>{
+              console.log(data, 'keep-alive');
+            })
+
+            // setInterval(() => {
+            //   client.send("keep-alive", null);
+            // }, 3000);
             /*
             listener.emit('init', "http://localhost:8899", this.nickName);
             listener.on('connect', ()=>{
