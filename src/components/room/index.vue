@@ -30,7 +30,8 @@ import client from "../../core/client";
 
 var socket;
 var ready = false;
-var tt = 0;
+
+var ws;
 export default {
     name: "HelloWorld",
     data() {
@@ -44,114 +45,52 @@ export default {
     props: {
         msg: String
     },
+    mounted(){
+        
+    },
     methods: {
       disconnect(){
-        client.disconnect();
+        // client.disconnect();
+        ws.close();
       },
         login() {
-            // client.init("ws://localhost:7788");
-            client.init("wss://wlwol.cn");
-            client.on(Message.TYPE_CONNECT, () => {
-              tt = Date.now();
-                client.send(Message.TYPE_LOGIN, { 
-                    nickName: this.nickName,
-                    avatarUrl: 'https://gss0.bdstatic.com/7Ls0a8Sm1A5BphGlnYG/sys/portrait/item/5d8356656e6e655f576f6e679218.jpg',
-                    openid: '123456',
-                    gender: 1,
-                });
-            });
-            client.on(Message.TYPE_MESSAGE, data => {
-                this.addMessage(data.player.nickName + "：" + data.msg);
-            });
-            client.on(Message.TYPE_LOGIN, data => {
-                this.addMessage("【" + data.nickName + "  （" + data.id + "）进入房间】");
-            });
-            client.on(Message.TYPE_WAIT_MATCH, data => {
-                console.log(Message.TYPE_WAIT_MATCH);
-                console.log(data);
-                this.addMessage("当前玩家个数：" + data.length);
-            })
-            client.on(Message.TYPE_END_MATCH, data => {
-                console.log(Message.TYPE_END_MATCH);
-                console.log(data);
+            ws = new WebSocket("wss://wlwol.cn/websocket");
+            // ws = new WebSocket("wss://wlwol.cn");
+            ws.onopen = (e)=>{
                 ready = true;
-                this.addMessage("匹配完成");
-            })
-            client.on(Message.TYPE_EXIT_MATCH, data => {
-                console.log(Message.TYPE_END_MATCH);
-                console.log(data);
-                ready = false;
-                this.addMessage(data.nickName + "退出");
-            })
+                console.log("serve start");
+                console.log(e);
+                this.send("login", this.nickName);
+            }
 
-            client.on(Message.TYPE_DISCONNECT, data => {
-              var n = Date.now() - tt;
-              var m = Math.floor(n / 1000);
-              console.log(data, m + 's 断开连接');
-              tt = Date.now();
-            })
-            client.on('keep-alive', data=>{
-              console.log(data, 'keep-alive');
-            })
+            ws.onclose = (e)=>{
+                console.log("serve close");
+                console.log(e);
+            }
 
-            // setInterval(() => {
-            //   client.send("keep-alive", null);
-            // }, 3000);
-            /*
-            listener.emit('init', "http://localhost:8899", this.nickName);
-            listener.on('connect', ()=>{
-                listener.emit('send', {
-                    type: Message.TYPE_LOGIN,
-                    data: {
-                        nickName: this.nickName
-                    }
-                });
-            })
+            ws.onmessage = (e)=>{
+                console.log("serve message");
+                console.log(e);
+                var obj = JSON.parse(e.data);
+                if(obj.type == "message"){
+                    this.addMessage(obj.msg);
+                }
+                else if(obj.type == "quit"){
+                    this.addMessage(obj.msg);
+                    this.addMessage("自动退出房间");
+                    this.disconnect();
+                }
 
-            listener.on(Message.TYPE_MESSAGE, data=>{
-                this.addMessage(data);
-            })
+            }
 
-            listener.on(Message.TYPE_START_MATCH, ()=>{
-                this.status = '查找匹配对手';
-            })
-
-            listener.on(Message.TYPE_END_MATCH, (data)=>{
-                this.status = '匹配对手成功';
-                this.addMessage(data);
-            })
-
-
-            listener.on('disconnect', ()=>{
-
-            })
-            */
-
-            /*
-            //线上
-            // socket = io('wss://wlwol.cn');
-
-            //本地
-            socket = io('http://localhost:8899');
-            socket.on('connect', ()=>{
-                console.log('socket connect====');
-                socket.emit('login', this.nickName);
-            });
-            
-            socket.on('msg', (data)=>{
-                console.log('socket msg====');
-                console.log(data);
-                this.addMessage(data);
-            });
-            
-            socket.on('disconnect', ()=>{
-                console.log('socket disconnect====');
-            });
-            */
+            ws.onerror = (e)=>{
+                console.log("serve error");
+                console.log(e);
+            }
         },
         say() {
             if(ready){
-                this.send(this.message);
+                this.send("message", this.message);
             }
             else{
                 this.addMessage("尚未匹配完成");
@@ -160,8 +99,9 @@ export default {
         clear() {
             this.list = [];
         },
-        send(msg) {
-            client.send(Message.TYPE_MESSAGE, msg);
+        send(type, msg) {
+            // client.send(Message.TYPE_MESSAGE, msg);
+            ws.send(JSON.stringify({type, msg}));
             this.message = "";
         },
         startMatch() {
