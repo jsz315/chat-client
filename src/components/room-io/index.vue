@@ -44,7 +44,7 @@ export default {
     },
     methods: {
         login() {
-            client.init("ws://localhost:8899");
+            client.init("ws://localhost:5566");
             // client.init("https://wlwol.cn");
             client.on(Message.TYPE_CONNECT, () => {
                 client.send(Message.TYPE_LOGIN, { 

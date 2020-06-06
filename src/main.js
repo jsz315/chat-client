@@ -1,5 +1,9 @@
 import Vue from 'vue'
 import App from './App.vue'
+import toastRegistry from './components/toast-view/index.js'
+
+// 这里也可以直接执行 toastRegistry()
+Vue.use(toastRegistry);
 
 Vue.config.productionTip = false
 

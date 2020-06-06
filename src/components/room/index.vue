@@ -3,7 +3,8 @@
         <div class="inputs login">
             昵称:
             <input class="txt" type="text" v-model="nickName" />
-            <div class="btn" @click="login">登录</div>
+            <div class="btn" @click="login(0)">本地</div>
+            <div class="btn" @click="login(1)">线上</div>
             <div class="btn" @click="disconnect">退出</div>
         </div>
         <div class="inputs">
@@ -25,7 +26,7 @@
 
 <script>
 import listener from "@/core/listener";
-import Message from "../../core/message";
+import {Message} from "../../core/message";
 import client from "../../core/client";
 
 var socket;
@@ -53,14 +54,17 @@ export default {
         // client.disconnect();
         ws.close();
       },
-        login() {
-            ws = new WebSocket("wss://wlwol.cn/websocket");
-            // ws = new WebSocket("wss://wlwol.cn");
+        login(n) {
+            if(n == 0){
+                ws = new WebSocket("ws://127.0.0.1:5566");
+            }
+            else{
+                ws = new WebSocket("wss://wlwol.cn/websocket");
+            }
             ws.onopen = (e)=>{
-                ready = true;
-                console.log("serve start");
+                console.log("serve open");
                 console.log(e);
-                this.send("login", this.nickName);
+                this.send(Message.TYPE_LOGIN, this.nickName);
             }
 
             ws.onclose = (e)=>{
@@ -72,15 +76,21 @@ export default {
                 console.log("serve message");
                 console.log(e);
                 var obj = JSON.parse(e.data);
-                if(obj.type == "message"){
+                if(obj.type == Message.TYPE_MESSAGE){
                     this.addMessage(obj.msg);
                 }
-                else if(obj.type == "quit"){
+                else if(obj.type == Message.TYPE_QUIT){
                     this.addMessage(obj.msg);
                     this.addMessage("自动退出房间");
                     this.disconnect();
                 }
-
+                else if(obj.type == Message.TYPE_WAIT_MATCH){
+                    this.addMessage("当前玩家个数：" + obj.players.length);
+                }
+                else if(obj.type == Message.TYPE_END_MATCH){
+                    ready = true;
+                    this.addMessage("匹配完成");
+                }
             }
 
             ws.onerror = (e)=>{
@@ -90,7 +100,7 @@ export default {
         },
         say() {
             if(ready){
-                this.send("message", this.message);
+                this.send(Message.TYPE_MESSAGE, this.message);
             }
             else{
                 this.addMessage("尚未匹配完成");
@@ -101,16 +111,17 @@ export default {
         },
         send(type, msg) {
             // client.send(Message.TYPE_MESSAGE, msg);
-            ws.send(JSON.stringify({type, msg}));
+            if(ws && ws.readyState == 1){
+                ws.send(JSON.stringify({type, msg}));
+            }
+            else{
+                this.$toast({message: "请重新登陆", duration: 3000})
+            }
             this.message = "";
         },
         startMatch() {
             this.status = "匹配中";
-            // listener.emit("send", {
-            //     type: Message.TYPE_START_MATCH
-            // });
-
-            client.send(Message.TYPE_START_MATCH);
+            this.send(Message.TYPE_START_MATCH);
         },
         addMessage(tip) {
             this.list.push(tip);
