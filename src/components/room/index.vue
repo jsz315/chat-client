@@ -73,6 +73,7 @@ export default {
             else{
                 ws = new WebSocket("wss://wlwol.cn/websocket");
             }
+            console.log("ws", ws);
 
             ws.onopen = (e)=>{
                 console.log("serve open");
@@ -80,7 +81,7 @@ export default {
                 this.send(Message.TYPE_LOGIN, {
                     nickName: this.nickName,
                     avatarUrl: "https://www.baidu.com/img/flexible/logo/pc/result@2.png",
-                    openid: "openid12345",
+                    openid: "openid_" + Date.now(),
                     gender: 1
                 });
 
@@ -129,7 +130,7 @@ export default {
                     setTimeout(()=>{
                         this.answerId = -1;
                         this.questionId++;
-                    }, 3000)
+                    }, 10000)
                 }
                 else if(obj.type == Message.TYPE_PING){
                     console.log(obj);
@@ -153,9 +154,9 @@ export default {
             this.list = [];
         },
         send(type, data) {
-            console.log("发送数据：");
-            console.log(type, data);
             if(ws && ws.readyState == 1){
+                console.log("发送数据：");
+                console.log(type, data);
                 ws.send(JSON.stringify({type, data}));
             }
             else{
