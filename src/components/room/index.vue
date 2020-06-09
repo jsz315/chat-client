@@ -78,17 +78,20 @@ export default {
             ws.onopen = (e)=>{
                 console.log("serve open");
                 console.log(e);
-                this.send(Message.TYPE_LOGIN, {
-                    nickName: this.nickName,
-                    avatarUrl: "https://www.baidu.com/img/flexible/logo/pc/result@2.png",
-                    openid: "openid_" + Date.now(),
-                    gender: 1
-                });
+                setTimeout(()=>{
+                    this.send(Message.TYPE_LOGIN, {
+                        nickName: this.nickName,
+                        avatarUrl: "https://www.baidu.com/img/flexible/logo/pc/result@2.png",
+                        openid: "openid_" + Date.now(),
+                        gender: 1
+                    });
+                }, 120)
+                
 
                 clearInterval(timer);
                 timer = setInterval(()=>{
                     this.send(Message.TYPE_PING, 0);
-                }, 6000)
+                }, 24000)
             }
 
             ws.onclose = (e)=>{
